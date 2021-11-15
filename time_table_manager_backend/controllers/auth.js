@@ -2,6 +2,7 @@ import userModel from '../models/User.js';
 import { nanoid } from 'nanoid';
 import sendCodeMail from '../helpers/sendAuthMail.js';
 import generateJWT from '../helpers/generateJWT.js';
+import { encodeString, compareHash } from '../helpers/crypt.js';
 
 const signUp = async (req, res) => {
   const { name, emailId, password } = req.body;
@@ -30,11 +31,17 @@ const signUp = async (req, res) => {
     return res.status(400).send(err);
   }
 
+  const { hashErr, hashedPassword } = await encodeString(password);
+
+  if (hashErr) {
+    return res.status(400).send('An error occured try again');
+  }
+
   await userModel.create({
     name,
     emailId,
     userId,
-    password,
+    password: hashedPassword,
     emailToken: code,
     emailTokenExpires: new Date(expiry),
   });
@@ -87,7 +94,17 @@ const login = async (req, res) => {
     return res.status(400).send('Pehle signup karo baba');
   }
 
-  if (password !== userData.password) {
+  const { hashErr, matches } = await compareHash(password, userData.password);
+
+  console.log(hashErr);
+
+  console.log(matches);
+
+  if (hashErr) {
+    return res.status(400).send(hashErr);
+  }
+
+  if (!matches) {
     return res.status(400).send('AAsatya password');
   }
 
@@ -107,7 +124,7 @@ const login = async (req, res) => {
 
   return res
     .status(200)
-    .send({ message: 'hogaya bhai login tu', data: userData });
+    .json({ message: 'hogaya bhai login tu', data: userData });
 };
 
 export { signUp, activateAcc, login };
