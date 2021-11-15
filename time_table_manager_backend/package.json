@@ -1,0 +1,21 @@
+{
+  "name": "time_table_manager_backend",
+  "version": "1.0.0",
+  "description": "This is the backend of my app time table manager",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js"
+  },
+  "author": "Swapnil Deshmane",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.0.12",
+    "nanoid": "^3.1.30",
+    "nodemailer": "^6.7.0"
+  }
+}
