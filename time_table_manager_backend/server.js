@@ -53,4 +53,4 @@ app.get('/getMyInfo', authJWT, getMyInfo);
 
 app.post('/createTimeTable', authJWT, createTimeTable);
 
-app.post('/getMyTImeTables', authJWT, getMyTimeTables);
+app.get('/getMyTimeTables', authJWT, getMyTimeTables);

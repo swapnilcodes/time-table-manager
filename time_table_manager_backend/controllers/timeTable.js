@@ -15,10 +15,11 @@ const createTimeTable = async (req, res) => {
       return res.status(500).send('Aap lapata hai');
     }
 
-    const existingTimeTables = await timeTableModel.find({ user: emailId })
-      .length;
+    const existingTimeTables = await timeTableModel.find({ user: emailId });
 
-    if (existingTimeTables > 3) {
+    console.log(existingTimeTables);
+
+    if (existingTimeTables.length > 3) {
       return res
         .status(400)
         .send(`You've already reached maximum number of timeTables`);
