@@ -60,3 +60,7 @@ const timeTableSchema = mongoose.Schema({
     },
   ],
 });
+
+const timeTableModel = mongoose.model('timeTables', timeTableSchema);
+
+export default timeTableModel;

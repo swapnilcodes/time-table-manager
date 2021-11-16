@@ -4,6 +4,7 @@ import Cors from 'cors';
 import { signUp, activateAcc, login } from './controllers/auth.js';
 import authJWT from './helpers/authorizeJWT.js';
 import getMyInfo from './controllers/getMyInfo.js';
+import { createTimeTable } from './controllers/timeTable.js';
 
 // app config
 const app = express();
@@ -49,3 +50,5 @@ app.post('/activateAccount', activateAcc);
 app.post('/login', login);
 
 app.get('/getMyInfo', authJWT, getMyInfo);
+
+app.post('/createTimeTable', authJWT, createTimeTable);
