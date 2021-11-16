@@ -38,6 +38,10 @@ const createTimeTable = async (req, res) => {
       sunday: [],
     });
 
+    userData.timeTables.push(timeTableId);
+
+    await userData.save();
+
     return res.status(201).send('created time table');
   } catch (err) {
     console.log(err);
@@ -47,4 +51,31 @@ const createTimeTable = async (req, res) => {
 
 const deleteTimeTable = () => {};
 
-export { createTimeTable, deleteTimeTable };
+const getMyTimeTables = async (req, res) => {
+  const { emailId } = req.user;
+
+  if (!emailId) {
+    return res.status(400).send('Kucch to gadbad hai daya');
+  }
+
+  try {
+    const userData = await userModel.findOne({ emailId });
+
+    if (!userData) {
+      return res.status(400).send('Aap lapata hai');
+    }
+
+    const myTimeTables = await timeTableModel.find({ user: emailId });
+
+    if (myTimeTables.length < 1) {
+      return res.status(200).send("You haven't created any timeTables yet...");
+    }
+
+    return res.status(200).send(myTimeTables);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send(err);
+  }
+};
+
+export { createTimeTable, deleteTimeTable, getMyTimeTables };
