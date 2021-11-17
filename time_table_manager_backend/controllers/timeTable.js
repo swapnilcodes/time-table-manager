@@ -50,7 +50,49 @@ const createTimeTable = async (req, res) => {
   }
 };
 
-const deleteTimeTable = () => {};
+const deleteTimeTable = async (req, res) => {
+  const { timeTableId } = req.query;
+
+  const { emailId } = req.user;
+
+  if (!timeTableId) {
+    return res.status(400).send('Fill all credentials');
+  }
+
+  if (!emailId) {
+    return res.status(500).send('kucch to gadbad hai daya');
+  }
+
+  try {
+    const userData = await userModel.findOne({ emailId });
+
+    if (!userData) {
+      return res.status(500).send('Aap lapata hai');
+    }
+
+    const timeTableExists =
+      userData.timeTables.filter((value) => value === timeTableId).length > 0;
+
+    if (!timeTableExists) {
+      return res.status(400).send('Invalid TimeTable id');
+    }
+
+    await timeTableModel.deleteOne({ timeTableId });
+
+    const newTimeTableList = userData.timeTables.filter(
+      (value) => value !== timeTableId
+    );
+
+    userData.timeTables = newTimeTableList;
+
+    await userData.save();
+
+    return res.status(200).send('deleted Time table');
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
 
 const getMyTimeTables = async (req, res) => {
   const { emailId } = req.user;
