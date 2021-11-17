@@ -9,6 +9,8 @@ import {
   deleteTimeTable,
   getMyTimeTables,
 } from './controllers/timeTable.js';
+import { addActivity } from './controllers/activityManager.js';
+import addSchedule from './controllers/schedule.js';
 
 // app config
 const app = express();
@@ -40,6 +42,18 @@ db.once('open', () => {
   app.listen(PORT, () => {
     console.log(`server started on ${PORT}`);
   });
+
+  const timeTableCollection = db.collection('timetables');
+
+  const timeTableChangeStream = timeTableCollection.watch();
+
+  timeTableChangeStream.on('change', async (change) => {
+    if (change.operationType === 'update') {
+      console.log(change.documentKey._id);
+
+      await addSchedule(change.updateDescription, change.documentKey._id);
+    }
+  });
 });
 
 //routes
@@ -60,3 +74,5 @@ app.post('/createTimeTable', authJWT, createTimeTable);
 app.get('/getMyTimeTables', authJWT, getMyTimeTables);
 
 app.delete('/deleteTimeTable', authJWT, deleteTimeTable);
+
+app.put('/addActivity', authJWT, addActivity);

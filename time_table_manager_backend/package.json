@@ -17,6 +17,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.0.12",
     "nanoid": "^3.1.30",
+    "node-schedule": "^2.0.0",
     "nodemailer": "^6.7.0"
   }
 }
