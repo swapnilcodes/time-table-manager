@@ -16,15 +16,39 @@ const addActivity = async (req, res) => {
     endingTimeMinute,
   } = req.body;
 
+  console.log(
+    'day' + day,
+    'activity title' + activityTitle,
+    'starting time hour' + startingTimeHour,
+    'ending time hour' + endingTimeHour,
+    'activity description' + activityDescription,
+    'time table id' + timeTableId,
+    'starting time minute' + startingTimeMinute,
+    'ending time minute' + endingTimeMinute
+  );
+
+  console.log(!day);
+  console.log(!activityTitle);
+  console.log(!startingTimeHour);
+  console.log(!endingTimeHour);
+  console.log(!activityDescription);
+  console.log(!timeTableId);
+  console.log(!startingTimeMinute);
+  console.log(!endingTimeMinute);
+
   if (
-    !day ||
-    !activityTitle ||
-    !startingTimeHour ||
-    !endingTimeHour ||
-    !activityDescription ||
-    !timeTableId ||
-    !startingTimeMinute ||
-    !endingTimeMinute
+    (!day ||
+      !activityTitle ||
+      !startingTimeHour ||
+      !endingTimeHour ||
+      !activityDescription ||
+      !timeTableId ||
+      !startingTimeMinute ||
+      !endingTimeMinute) &&
+    startingTimeMinute !== 0 &&
+    startingTimeHour !== 0 &&
+    endingTimeMinute !== 0 &&
+    endingTimeHour !== 0
   ) {
     return res.status(400).send('fill all credentials');
   }

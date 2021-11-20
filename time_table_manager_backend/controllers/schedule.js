@@ -1,15 +1,32 @@
 import schedule from 'node-schedule';
 import timeTableModel from '../models/TimeTable.js';
 
+function findValueByPrefix(object, prefix) {
+  if (object[prefix]) {
+    console.log('direct available');
+    console.log(object[prefix][0]);
+    return object[prefix][0];
+  } else {
+    for (var property in object) {
+      if (
+        object.hasOwnProperty(property) &&
+        property.toString().startsWith(prefix)
+      ) {
+        return object[property];
+      }
+    }
+  }
+}
+
 const addSchedule = async (updateDescription, timeTableId) => {
   try {
-    const activity = updateDescription.updatedFields;
-
     const timeTableData = await timeTableModel.findById(timeTableId);
 
-    console.log(timeTableData);
+    const activityData = updateDescription.updatedFields;
 
-    let dayNumber;
+    if (!timeTableData) {
+      console.log('time table is missing');
+    }
 
     const days = [
       'monday',
@@ -21,27 +38,54 @@ const addSchedule = async (updateDescription, timeTableId) => {
       'sunday',
     ];
 
-    days.forEach((currentDay) => {
-      const inThisDay =
+    let dayNumber;
+    let day;
+
+    console.log(activityData);
+
+    console.log(`activityId ${activityData.activityId}`);
+
+    days.some((currentDay) => {
+      console.log(currentDay);
+      console.log(timeTableData[currentDay]);
+
+      let inThisDay =
         timeTableData[currentDay].filter(
-          (value) => value.activityId === activity.activityId
+          (value) =>
+            value.activityId ===
+            findValueByPrefix(activityData, currentDay).activityId
         ).length > 0;
+
+      console.log(`in this day: ${inThisDay}`);
 
       if (inThisDay) {
         dayNumber = days.indexOf(currentDay) + 1;
+        day = currentDay;
+        console.log(`dayNumber: ${dayNumber}, day: ${day}`);
+        return true;
       }
     });
 
-    const startingTimeString = `${activity.startingTimeMinute}${activity.startingTimeHour}**${dayNumber}`;
+    const startingTimeString = `${
+      findValueByPrefix(activityData, day).startingTimeMinute
+    } ${
+      findValueByPrefix(activityData, day).startingTimeHour
+    } * * ${dayNumber}`;
 
-    const endingTimeString = `${activity.endingTimeMinute}${activity.endingTimeHour}**${dayNumber}`;
+    const endingTimeString = `${
+      findValueByPrefix(activityData, day).endingTimeMinute
+    } ${findValueByPrefix(activityData, day).endingTimeHour} * * ${dayNumber}`;
 
     schedule.scheduleJob(startingTimeString, function () {
-      console.log(`Time for ${activity.activityTitle}`);
+      console.log(
+        `time to start ${findValueByPrefix(activityData, day).activityTitle}`
+      );
     });
 
     schedule.scheduleJob(endingTimeString, function () {
-      console.log(`${activity.activityTitle} should be done`);
+      console.log(
+        `time to end ${findValueByPrefix(activityData, day).activityTitle}}`
+      );
     });
   } catch (err) {
     console.log(err);
