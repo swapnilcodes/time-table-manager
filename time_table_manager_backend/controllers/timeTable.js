@@ -37,6 +37,7 @@ const createTimeTable = async (req, res) => {
       friday: [],
       saturday: [],
       sunday: [],
+      active: false,
     });
 
     userData.timeTables.push(timeTableId);
@@ -121,4 +122,56 @@ const getMyTimeTables = async (req, res) => {
   }
 };
 
-export { createTimeTable, deleteTimeTable, getMyTimeTables };
+const activateTimeTable = async (req, res) => {
+  try {
+    const { timeTableId } = req.body;
+
+    const { emailId } = req.user;
+
+    if (!emailId) {
+      return res.status(400).send('kucch to gadbad hai daya');
+    }
+
+    if (!timeTableId) {
+      return res.status(400).send('Fill all credentials');
+    }
+
+    const timeTableData = await timeTableModel.findOne({
+      timeTableId,
+      user: emailId,
+    });
+
+    if (!timeTableData) {
+      return res.status(400).send('Invalid Time Table Data');
+    }
+
+    if (timeTableData.active) {
+      return res.status(400).send('Time table already active');
+    }
+
+    const myTimeTables = await timeTableModel.find({ user: emailId });
+
+    const activeTimeTables = myTimeTables.filter((value) => value.active);
+
+    console.log(activeTimeTables);
+
+    if (activeTimeTables.length > 0) {
+      return res
+        .status(400)
+        .send(
+          'Other time table is already active, deactivate it to activate this timetable'
+        );
+    }
+
+    timeTableData.active = true;
+
+    await timeTableData.save();
+
+    return res.status(200).send('Activated this timetable');
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send(err);
+  }
+};
+
+export { createTimeTable, deleteTimeTable, getMyTimeTables, activateTimeTable };

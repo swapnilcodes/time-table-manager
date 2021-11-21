@@ -18,7 +18,7 @@ function findValueByPrefix(object, prefix) {
   }
 }
 
-const addSchedule = async (updateDescription, timeTableId) => {
+const addSchedule = async (updateDescription, timeTableId, socket) => {
   try {
     const timeTableData = await timeTableModel.findById(timeTableId);
 
@@ -80,12 +80,18 @@ const addSchedule = async (updateDescription, timeTableId) => {
       console.log(
         `time to start ${findValueByPrefix(activityData, day).activityTitle}`
       );
+      socket.emit('start', {
+        activity: findValueByPrefix(activityData, day).activityTitle,
+      });
     });
 
     schedule.scheduleJob(endingTimeString, function () {
       console.log(
         `time to end ${findValueByPrefix(activityData, day).activityTitle}}`
       );
+      socket.emit('end', {
+        activity: findValueByPrefix(activityData, day).activityTitle,
+      });
     });
   } catch (err) {
     console.log(err);

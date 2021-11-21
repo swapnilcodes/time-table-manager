@@ -80,6 +80,7 @@ const timeTableSchema = mongoose.Schema({
       activityId: String,
     },
   ],
+  active: { type: Boolean, default: false },
 });
 
 const timeTableModel = mongoose.model('timeTables', timeTableSchema);
