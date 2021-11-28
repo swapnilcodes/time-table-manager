@@ -7,11 +7,17 @@ import getMyInfo from './controllers/getMyInfo.js';
 import {
   activateTimeTable,
   createTimeTable,
+  deactivateTimeTable,
   deleteTimeTable,
   getMyTimeTables,
 } from './controllers/timeTable.js';
-import { addActivity } from './controllers/activityManager.js';
-import addSchedule from './controllers/schedule.js';
+import {
+  addActivity,
+  addActivitiesFromDay,
+  copySingleActivityFromDay,
+  copyActivitiesFromOtherTimeTable,
+} from './controllers/activityManager.js';
+import { setSocket } from './controllers/schedule.js';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 
@@ -48,21 +54,7 @@ db.once('open', () => {
 
   io.on('connection', (socket) => {
     console.log(`new socket connected ${socket.id}`);
-    const timeTableCollection = db.collection('timetables');
-
-    const timeTableChangeStream = timeTableCollection.watch();
-
-    timeTableChangeStream.on('change', async (change) => {
-      if (change.operationType === 'update') {
-        console.log(change.documentKey._id);
-
-        await addSchedule(
-          change.updateDescription,
-          change.documentKey._id,
-          socket
-        );
-      }
-    });
+    setSocket(socket);
   });
 
   httpServer.listen(PORT, () => {
@@ -92,3 +84,15 @@ app.delete('/deleteTimeTable', authJWT, deleteTimeTable);
 app.put('/activateTimeTable', authJWT, activateTimeTable);
 
 app.put('/addActivity', authJWT, addActivity);
+
+app.put('/copyActivitiesFromDay', authJWT, addActivitiesFromDay);
+
+app.put('/copySingleActivityFromDay', authJWT, copySingleActivityFromDay);
+
+app.put(
+  '/copyActivitiesFromOtherTimeTable',
+  authJWT,
+  copyActivitiesFromOtherTimeTable
+);
+
+app.delete('/deactivateTimeTable', authJWT, deactivateTimeTable);

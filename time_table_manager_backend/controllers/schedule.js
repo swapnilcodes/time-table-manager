@@ -18,14 +18,22 @@ function findValueByPrefix(object, prefix) {
   }
 }
 
-const addSchedule = async (updateDescription, timeTableId, socket) => {
-  try {
-    const timeTableData = await timeTableModel.findById(timeTableId);
+let socket;
 
-    const activityData = updateDescription.updatedFields;
+const setSocket = async (socketInstance) => {
+  socket = socketInstance;
+};
+
+const manualAddSchedule = async (activityData, timeTableId, day) => {
+  try {
+    const timeTableData = await timeTableModel.findOne({ timeTableId });
 
     if (!timeTableData) {
       console.log('time table is missing');
+    }
+
+    if (activityData.scheduled) {
+      return { err: 'activity already scheduled' };
     }
 
     const days = [
@@ -38,64 +46,85 @@ const addSchedule = async (updateDescription, timeTableId, socket) => {
       'sunday',
     ];
 
-    let dayNumber;
-    let day;
+    const dayNumber = days.indexOf(day) + 1;
+
+    const startingTimeString = `${activityData.startingTimeMinute} ${activityData.startingTimeHour} * * ${dayNumber}`;
+
+    const endingTimeString = `${activityData.endingTimeMinute} ${activityData.endingTimeHour} * * ${dayNumber}`;
+
+    if (activityData.scheduled === true) {
+      return { err: 'Activity Already Registered' };
+    }
 
     console.log(activityData);
 
-    console.log(`activityId ${activityData.activityId}`);
-
-    days.some((currentDay) => {
-      console.log(currentDay);
-      console.log(timeTableData[currentDay]);
-
-      let inThisDay =
-        timeTableData[currentDay].filter(
-          (value) =>
-            value.activityId ===
-            findValueByPrefix(activityData, currentDay).activityId
-        ).length > 0;
-
-      console.log(`in this day: ${inThisDay}`);
-
-      if (inThisDay) {
-        dayNumber = days.indexOf(currentDay) + 1;
-        day = currentDay;
-        console.log(`dayNumber: ${dayNumber}, day: ${day}`);
-        return true;
+    schedule.scheduleJob(activityData.activityId, startingTimeString, () => {
+      console.log(`time to start ${activityData.activityTitle}`);
+      if (socket) {
+        socket.emit('start', {
+          activity: activityData.activityTitle,
+          user: timeTableData.user,
+        });
       }
     });
 
-    const startingTimeString = `${
-      findValueByPrefix(activityData, day).startingTimeMinute
-    } ${
-      findValueByPrefix(activityData, day).startingTimeHour
-    } * * ${dayNumber}`;
+    schedule.scheduleJob(
+      activityData.endingActivityId,
+      endingTimeString,
+      () => {
+        console.log(`time to end ${activityData.activityTitle}`);
+        if (socket) {
+          socket.emit('end', {
+            activity: activityData.activityTitle,
+            user: timeTableData.user,
+          });
+        }
+      }
+    );
 
-    const endingTimeString = `${
-      findValueByPrefix(activityData, day).endingTimeMinute
-    } ${findValueByPrefix(activityData, day).endingTimeHour} * * ${dayNumber}`;
-
-    schedule.scheduleJob(startingTimeString, function () {
-      console.log(
-        `time to start ${findValueByPrefix(activityData, day).activityTitle}`
-      );
-      socket.emit('start', {
-        activity: findValueByPrefix(activityData, day).activityTitle,
-      });
-    });
-
-    schedule.scheduleJob(endingTimeString, function () {
-      console.log(
-        `time to end ${findValueByPrefix(activityData, day).activityTitle}}`
-      );
-      socket.emit('end', {
-        activity: findValueByPrefix(activityData, day).activityTitle,
-      });
-    });
+    console.log(`activityId ${activityData.activityId}`);
   } catch (err) {
     console.log(err);
   }
 };
 
-export default addSchedule;
+const removeSchedule = async (activityData, timeTableId, day) => {
+  try {
+    if (!activity.scheduled) {
+      return { err: 'pehle schedule to karo aana' };
+    }
+
+    const timeTableData = await timeTableModel.findOne({ timeTableId });
+
+    if (!timeTableData) {
+      return { err: 'Invalid time table id' };
+    }
+
+    const activityExists =
+      timeTableModel.day.filter(
+        (value) => value.activityId === activityData.activityId
+      ).length > 0;
+
+    if (!activityExists) {
+      return { err: 'activity does not exist' };
+    }
+
+    const startingJob = schedule.scheduledJobs[activityData.activityId];
+
+    startingJob.cancel();
+
+    const endingJob = schedule.scheduledJobs[activityData.endingActivityId];
+
+    endingJob.cancel();
+
+    console.log('removed job');
+
+    return { message: 'removed job' };
+  } catch (err) {
+    console.log(err);
+
+    return { err };
+  }
+};
+
+export { manualAddSchedule, setSocket, removeSchedule };

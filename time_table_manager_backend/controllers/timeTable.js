@@ -1,6 +1,7 @@
 import timeTableModel from '../models/TimeTable.js';
 import userModel from '../models/User.js';
 import { nanoid } from 'nanoid';
+import { manualAddSchedule, removeSchedule } from './schedule.js';
 
 const createTimeTable = async (req, res) => {
   const { emailId } = req.user;
@@ -165,6 +166,55 @@ const activateTimeTable = async (req, res) => {
 
     timeTableData.active = true;
 
+    if (timeTableData.monday !== []) {
+      timeTableData.monday.forEach(async (activity) => {
+        await manualAddSchedule(activity, timeTableId, 'monday');
+        activity.scheduled = true;
+      });
+    }
+
+    if (timeTableData.tuesday !== []) {
+      timeTableData.tuesday.forEach(async (activity) => {
+        await manualAddSchedule(activity, timeTableId, 'tuesday');
+        activity.scheduled = true;
+      });
+    }
+
+    if (timeTableData.wednesday !== []) {
+      timeTableData.wednesday.forEach(async (activity) => {
+        await manualAddSchedule(activity, timeTableId, 'wednesday');
+        activity.scheduled = true;
+      });
+    }
+
+    if (timeTableData.thursday !== []) {
+      timeTableData.thursday.forEach(async (activity) => {
+        await manualAddSchedule(activity, timeTableId, 'thursday');
+        activity.scheduled = true;
+      });
+    }
+
+    if (timeTableData.friday !== []) {
+      timeTableData.friday.forEach(async (activity) => {
+        await manualAddSchedule(activity, timeTableId, 'friday');
+        activity.scheduled = true;
+      });
+    }
+
+    if (timeTableData.saturday !== []) {
+      timeTableData.saturday.forEach(async (activity) => {
+        await manualAddSchedule(saturday, timeTableId, 'saturday');
+        activity.scheduled = true;
+      });
+    }
+
+    if (timeTableData.sunday !== []) {
+      timeTableData.sunday.forEach(async (activity) => {
+        await manualAddSchedule(activity, timeTableId, 'sunday');
+        activity.scheduled = true;
+      });
+    }
+
     await timeTableData.save();
 
     return res.status(200).send('Activated this timetable');
@@ -174,4 +224,103 @@ const activateTimeTable = async (req, res) => {
   }
 };
 
-export { createTimeTable, deleteTimeTable, getMyTimeTables, activateTimeTable };
+const deactivateTimeTable = async (req, res) => {
+  const { emailId } = req.user;
+  if (!emailId) {
+    return res.status(400).send('kuccch to gadbad hai daya');
+  }
+
+  const { timeTableId } = req.body;
+
+  if (!timeTableId) {
+    return res.status(400).send('fill all credentials');
+  }
+
+  try {
+    const userData = await userModel.findOne({ emailId });
+
+    if (!userData) {
+      return res.status(400).send('Aap lapata hai');
+    }
+
+    const timeTableExists =
+      userData.timeTables.filter((value) => value === timeTableId).length > 0;
+
+    if (!timeTableExists) {
+      return res.status(400).send('Invalid time table id');
+    }
+
+    const timeTableData = await timeTableModel.findOne(timeTableId);
+
+    if (!timeTableData) {
+      return res.status(400).send('Invalid time table id');
+    }
+
+    timeTableData.active = false;
+
+    if (timeTableData['monday'].length > 0) {
+      timeTableData['monday'].forEach(async (activity) => {
+        await removeSchedule(activity, timeTableId, 'monday ');
+        activity.scheduled = false;
+      });
+    }
+
+    if (timeTableData['tuesday'].length > 0) {
+      timeTableData['tuesday'].forEach(async (activity) => {
+        await removeSchedule(activity, timeTableId, 'tuesday ');
+        activity.scheduled = false;
+      });
+    }
+
+    if (timeTableData['wednesday'].length > 0) {
+      timeTableData['wednesday'].forEach(async (activity) => {
+        await removeSchedule(activity, timeTableId, 'wednesday ');
+        activity.scheduled = false;
+      });
+    }
+
+    if (timeTableData['thursday'].length > 0) {
+      timeTableData['thursday'].forEach(async (activity) => {
+        await removeSchedule(activity, timeTableId, 'thursday ');
+        activity.scheduled = false;
+      });
+    }
+
+    if (timeTableData['friday'].length > 0) {
+      timeTableData['friday'].forEach(async (activity) => {
+        await removeSchedule(activity, timeTableId, 'friday');
+        activity.scheduled = false;
+      });
+    }
+
+    if (timeTableData['saturday'].length > 0) {
+      timeTableData['saturday'].forEach(async (activity) => {
+        await removeSchedule(activity, timeTableId, 'saturday');
+        activity.scheduled = false;
+      });
+    }
+
+    if (timeTableData['sunday'].length > 0) {
+      timeTableData['sunday'].forEach(async (activity) => {
+        await removeSchedule(activity, timeTableId, 'sunday');
+        activity.scheduled = false;
+      });
+    }
+
+    await timeTableData.save();
+
+    return res.status(400).send('deactivated Timetable');
+  } catch (err) {
+    console.log(err);
+
+    return res.status(400).send(err);
+  }
+};
+
+export {
+  createTimeTable,
+  deleteTimeTable,
+  getMyTimeTables,
+  activateTimeTable,
+  deactivateTimeTable,
+};

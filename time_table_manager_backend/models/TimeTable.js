@@ -12,6 +12,8 @@ const timeTableSchema = mongoose.Schema({
       activityTitle: String,
       activityDescription: String,
       activityId: String,
+      scheduled: { type: Boolean, default: false },
+      endingActivityId: String,
     },
   ],
   tuesday: [
@@ -23,6 +25,8 @@ const timeTableSchema = mongoose.Schema({
       activityTitle: String,
       activityDescription: String,
       activityId: String,
+      scheduled: { type: Boolean, default: false },
+      endingActivityId: String,
     },
   ],
   wednesday: [
@@ -34,6 +38,8 @@ const timeTableSchema = mongoose.Schema({
       activityTitle: String,
       activityDescription: String,
       activityId: String,
+      scheduled: { type: Boolean, default: false },
+      endingActivityId: String,
     },
   ],
   thursday: [
@@ -45,6 +51,8 @@ const timeTableSchema = mongoose.Schema({
       activityTitle: String,
       activityDescription: String,
       activityId: String,
+      scheduled: { type: Boolean, default: false },
+      endingActivityId: String,
     },
   ],
   friday: [
@@ -56,6 +64,8 @@ const timeTableSchema = mongoose.Schema({
       activityTitle: String,
       activityDescription: String,
       activityId: String,
+      scheduled: { type: Boolean, default: false },
+      endingActivityId: String,
     },
   ],
   saturday: [
@@ -67,6 +77,8 @@ const timeTableSchema = mongoose.Schema({
       activityTitle: String,
       activityDescription: String,
       activityId: String,
+      scheduled: { type: Boolean, default: false },
+      endingActivityId: String,
     },
   ],
   sunday: [
@@ -78,6 +90,8 @@ const timeTableSchema = mongoose.Schema({
       activityTitle: String,
       activityDescription: String,
       activityId: String,
+      scheduled: { type: Boolean, default: false },
+      endingActivityId: String,
     },
   ],
   active: { type: Boolean, default: false },
