@@ -16,6 +16,7 @@ import {
   addActivitiesFromDay,
   copySingleActivityFromDay,
   copyActivitiesFromOtherTimeTable,
+  deleteActivity,
 } from './controllers/activityManager.js';
 import { setSocket } from './controllers/schedule.js';
 import { createServer } from 'http';
@@ -96,3 +97,5 @@ app.put(
 );
 
 app.delete('/deactivateTimeTable', authJWT, deactivateTimeTable);
+
+app.delete('/deleteActivity', authJWT, deleteActivity);

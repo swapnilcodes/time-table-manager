@@ -1,7 +1,7 @@
 import userModel from '../models/User.js';
 import timeTableModel from '../models/TimeTable.js';
 import { nanoid } from 'nanoid';
-import { manualAddSchedule } from './schedule.js';
+import { manualAddSchedule, removeSchedule } from './schedule.js';
 
 const addActivity = async (req, res) => {
   const { emailId } = req.user;
@@ -366,9 +366,73 @@ const copyActivitiesFromOtherTimeTable = async (req, res) => {
   }
 };
 
+const deleteActivity = async (req, res) => {
+  const { emailId } = req.user;
+
+  const { timeTableId, day, activityId } = req.query;
+
+  if (!emailId) {
+    return res.status(400).send('kucch to gadbad hai daya');
+  }
+
+  if (!timeTableId || !day || !activityId) {
+    return res.status(400).send('Fill all credentials');
+  }
+
+  try {
+    const userData = await userModel.findOne({ emailId });
+
+    const timeTableExists =
+      userData.timeTables.filter((value) => value === timeTableId).length > 0;
+
+    if (!timeTableExists) {
+      return res.status(400).send('Invalid time table id');
+    }
+
+    const timeTableData = await timeTableModel.findOne({ timeTableId });
+
+    if (!timeTableData) {
+      return res.status(400).send('Invalid time table id');
+    }
+
+    if (!timeTableData[day] && timeTableData !== []) {
+      return res.status(400).send('Invalid day');
+    }
+
+    const activityExists =
+      timeTableData[day].filter((value) => value.activityId === activityId)
+        .length > 0;
+
+    if (!activityExists) {
+      return res.status(400).send('Invalid activity id');
+    }
+
+    const newActivities = timeTableData[day].filter(
+      (value) => value.activityId !== activityId
+    );
+
+    const activityData = timeTableData[day].filter(
+      (value) => value.activityId === activityId
+    )[0];
+
+    timeTableData[day] = newActivities;
+
+    await removeSchedule(activityData, timeTableId, day);
+
+    await timeTableData.save();
+
+    return res.status(200).send('Deleted Activity');
+  } catch (err) {
+    console.log(err);
+
+    return res.status(400).send(err);
+  }
+};
+
 export {
   addActivity,
   addActivitiesFromDay,
   copySingleActivityFromDay,
   copyActivitiesFromOtherTimeTable,
+  deleteActivity,
 };

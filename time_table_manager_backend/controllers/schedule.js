@@ -90,7 +90,7 @@ const manualAddSchedule = async (activityData, timeTableId, day) => {
 
 const removeSchedule = async (activityData, timeTableId, day) => {
   try {
-    if (!activity.scheduled) {
+    if (!activityData.scheduled) {
       return { err: 'pehle schedule to karo aana' };
     }
 

@@ -79,6 +79,57 @@ const deleteTimeTable = async (req, res) => {
       return res.status(400).send('Invalid TimeTable id');
     }
 
+    const timeTableData = await timeTableModel.findOne({ timeTableId });
+
+    if (timeTableData['monday'].length > 0) {
+      timeTableData['monday'].forEach(async (activity) => {
+        await removeSchedule(activity, timeTableId, 'monday ');
+        activity.scheduled = false;
+      });
+    }
+
+    if (timeTableData['tuesday'].length > 0) {
+      timeTableData['tuesday'].forEach(async (activity) => {
+        await removeSchedule(activity, timeTableId, 'tuesday ');
+        activity.scheduled = false;
+      });
+    }
+
+    if (timeTableData['wednesday'].length > 0) {
+      timeTableData['wednesday'].forEach(async (activity) => {
+        await removeSchedule(activity, timeTableId, 'wednesday ');
+        activity.scheduled = false;
+      });
+    }
+
+    if (timeTableData['thursday'].length > 0) {
+      timeTableData['thursday'].forEach(async (activity) => {
+        await removeSchedule(activity, timeTableId, 'thursday ');
+        activity.scheduled = false;
+      });
+    }
+
+    if (timeTableData['friday'].length > 0) {
+      timeTableData['friday'].forEach(async (activity) => {
+        await removeSchedule(activity, timeTableId, 'friday');
+        activity.scheduled = false;
+      });
+    }
+
+    if (timeTableData['saturday'].length > 0) {
+      timeTableData['saturday'].forEach(async (activity) => {
+        await removeSchedule(activity, timeTableId, 'saturday');
+        activity.scheduled = false;
+      });
+    }
+
+    if (timeTableData['sunday'].length > 0) {
+      timeTableData['sunday'].forEach(async (activity) => {
+        await removeSchedule(activity, timeTableId, 'sunday');
+        activity.scheduled = false;
+      });
+    }
+
     await timeTableModel.deleteOne({ timeTableId });
 
     const newTimeTableList = userData.timeTables.filter(
