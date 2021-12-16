@@ -6,10 +6,17 @@ import { encodeString, compareHash } from '../helpers/crypt.js';
 
 const signUp = async (req, res) => {
   const { name, emailId, password } = req.body;
+  console.log(req.body);
+
+  console.log(name);
+  console.log(password);
+  console.log(emailId);
 
   if (!name || !emailId || !password) {
     return res.status(400).send('fill all credentials');
   }
+
+ 
 
   const userId = nanoid();
 
