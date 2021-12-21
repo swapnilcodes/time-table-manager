@@ -3,7 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class StorageController {
   final FlutterSecureStorage storage = new FlutterSecureStorage();
 
-  Future<String> getJWT() async {
+  Future<String?> getJWT() async {
     var JWTValue = await storage.read(key: 'jwt_token');
 
     return JWTValue.toString();

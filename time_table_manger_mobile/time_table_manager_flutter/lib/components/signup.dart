@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../helpers/routes.dart';
-import '../controllers/auth.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Signup extends StatefulWidget {
   const Signup({Key? key}) : super(key: key);
@@ -20,20 +21,22 @@ class _SignupState extends State<Signup> {
   String emailIdErrorText = '';
   String passwordErrorText = '';
 
+  static final String apiUrl = '10.0.2.2';
+
   makeSignUpAnimation() async {
     setState(() {
       changeSignupButton = true;
     });
+    sendSignUpRequest();
 
     await Future.delayed(Duration(milliseconds: 150));
 
     setState(() {
       changeSignupButton = false;
     });
-    sendSignUpRequest();
   }
 
-  sendSignUpRequest() {
+  sendSignUpRequest() async {
     if (!name.isEmpty) {
       if (!emailId.isEmpty) {
         if (password.length >= 5) {
@@ -42,8 +45,38 @@ class _SignupState extends State<Signup> {
             emailIdErrorText = '';
             nameErrorText = '';
           });
-          var result = Auth.signUp(name, emailId, password);
-          print(result.toString());
+
+          var data = {'name': name, 'emailId': emailId, 'password': password};
+
+          await http
+              .post(
+                  Uri(
+                      host: apiUrl,
+                      path: '/signup',
+                      port: 5000,
+                      scheme: 'http'),
+                  headers: <String, String>{
+                    'Content-Type': 'application/json; charset=UTF-8',
+                  },
+                  body: json.encode(<String, String>{
+                    'name': name,
+                    'emailId': emailId,
+                    'password': password
+                  }))
+              .then((response) {
+            print(response.statusCode);
+            if (response.statusCode == 200 || response.statusCode == 201) {
+              Navigator.pushNamed(context, Routes.account_activation_route,
+                  arguments: {'emailId': emailId, 'password': password});
+            } else if (response.statusCode == 500) {
+              Navigator.pushNamed(context, Routes.err_route);
+            } else if (response.statusCode == 400) {
+              Navigator.of(context).pushNamed(Routes.defined_err_route,
+                  arguments: response.body.toString());
+            }
+          }).catchError((error) {
+            print(error.toString());
+          });
         } else {
           setState(() {
             passwordErrorText = 'Your password needs to be atleast 6 digits';

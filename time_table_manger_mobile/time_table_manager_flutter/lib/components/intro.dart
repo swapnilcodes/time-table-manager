@@ -6,29 +6,22 @@ import '../controllers/storage_controller.dart';
 class Intro extends StatelessWidget {
   const Intro({Key? key}) : super(key: key);
 
-  bool nullCheck(String? jwt) {
-    print('jwt: $jwt');
-    if (jwt != null) {
-      if (!jwt.isEmpty) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  }
-
   switchToNextScreen(BuildContext context) async {
-    var storageController = StorageController();
-    var jwtExists = await storageController.getJWT();
-    print(jwtExists);
-    if (nullCheck(jwtExists)) {
-      print("jwt doesn't exist");
-      await Future.delayed(Duration(seconds: 6));
-      Navigator.pushNamed(context, Routes.no_login_home_route);
-    } else {
-      print("jwt exists");
+    try {
+      var storageController = StorageController();
+      var jwtExists = await storageController.getJWT();
+      print(jwtExists);
+      if (jwtExists == null) {
+        print("jwt doesn't exist");
+        await Future.delayed(Duration(seconds: 6));
+        Navigator.pushNamed(context, Routes.no_login_home_route);
+      } else {
+        await Future.delayed(Duration(seconds: 6));
+
+        Navigator.of(context).pushNamed(Routes.home_route);
+      }
+    } catch (err) {
+      print(err);
     }
   }
 

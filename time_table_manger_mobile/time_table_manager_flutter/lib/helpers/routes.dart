@@ -5,4 +5,6 @@ class Routes {
   static String signup_route = '/signup';
   static String home_route = '/home';
   static String account_activation_route = '/activateAccount';
+  static String err_route = '/err';
+  static String defined_err_route = '/defined-err';
 }

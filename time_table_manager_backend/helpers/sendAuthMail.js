@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-const sendCodeMail = async (otp, reciever) => {
+const sendCodeMail = (otp, reciever) => {
   const message = `<h1>Your OTP for verifying your account is ${otp}</h1>`;
 
   var transporter = nodemailer.createTransport({
@@ -21,7 +21,7 @@ const sendCodeMail = async (otp, reciever) => {
 
   transporter.sendMail(mailOptions, (err, info) => {
     if (err) {
-      return console.log(err);
+      return err;
     }
     console.log('message sent: ' + info.messageId);
   });
