@@ -1,24 +1,43 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:time_table_manager_flutter/helpers/routes.dart';
 import '../controllers/storage_controller.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
 
 class Intro extends StatelessWidget {
   const Intro({Key? key}) : super(key: key);
 
+  static final String apiUrl =
+      'time-table-manager-backend.swapnilcodes.repl.co';
+
   switchToNextScreen(BuildContext context) async {
     try {
       var storageController = StorageController();
-      var jwtExists = await storageController.getJWT();
-      print(jwtExists);
-      if (jwtExists == null) {
+      bool jwtExists = await storageController.jwtExists();
+      print('jwt exists: $jwtExists');
+      await Future.delayed(Duration(seconds: 6));
+      if (!jwtExists) {
         print("jwt doesn't exist");
-        await Future.delayed(Duration(seconds: 6));
         Navigator.pushNamed(context, Routes.no_login_home_route);
       } else {
-        await Future.delayed(Duration(seconds: 6));
+        var jwt = await storageController.getJWT();
 
-        Navigator.of(context).pushNamed(Routes.home_route);
+        await http.get(
+          Uri(
+            scheme: 'https',
+            host: apiUrl,
+            path: '/getMyInfo',
+          ),
+          headers: <String, String>{
+            'authToken': jwt.toString(),
+          },
+        ).then((userData) => {
+              Navigator.pushNamed(context, Routes.home_route,
+                  arguments: json.decode(userData.body.toString()))
+            });
       }
     } catch (err) {
       print(err);

@@ -21,7 +21,8 @@ class _SignupState extends State<Signup> {
   String emailIdErrorText = '';
   String passwordErrorText = '';
 
-  static final String apiUrl = '10.0.2.2';
+  static final String apiUrl =
+      'time-table-manager-backend.swapnilcodes.repl.co';
 
   makeSignUpAnimation() async {
     setState(() {
@@ -50,19 +51,22 @@ class _SignupState extends State<Signup> {
 
           await http
               .post(
-                  Uri(
-                      host: apiUrl,
-                      path: '/signup',
-                      port: 5000,
-                      scheme: 'http'),
-                  headers: <String, String>{
-                    'Content-Type': 'application/json; charset=UTF-8',
-                  },
-                  body: json.encode(<String, String>{
-                    'name': name,
-                    'emailId': emailId,
-                    'password': password
-                  }))
+            Uri(
+              scheme: 'https',
+              host: apiUrl,
+              path: '/signup',
+            ),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: json.encode(
+              <String, String>{
+                'name': name,
+                'emailId': emailId,
+                'password': password
+              },
+            ),
+          )
               .then((response) {
             print(response.statusCode);
             if (response.statusCode == 200 || response.statusCode == 201) {

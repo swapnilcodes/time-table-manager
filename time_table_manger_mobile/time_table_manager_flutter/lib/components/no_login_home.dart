@@ -97,7 +97,7 @@ class _NoLoginHomeState extends State<NoLoginHome> {
                 color: Color.fromRGBO(237, 47, 47, 0.8),
                 borderRadius: BorderRadius.circular(10),
                 child: InkWell(
-                  onTap: () => print('done'),
+                  onTap: () => makeLoginAnimation(),
                   child: AnimatedContainer(
                     duration: Duration(seconds: 1),
                     width: !changeLoginButton ? 290 : 250,

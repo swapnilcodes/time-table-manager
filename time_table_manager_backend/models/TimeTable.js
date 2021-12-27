@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 const timeTableSchema = mongoose.Schema({
   timeTableId: { type: String, required: true },
   user: { type: String, required: true },
+  title: {type: String, required: true},
   monday: [
     {
       startingTimeHour: String,

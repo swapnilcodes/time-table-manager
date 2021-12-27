@@ -39,7 +39,8 @@ class _ActivateAccountState extends State<ActivateAccount> {
   var otp = '';
 
   // backend api url
-  static final String apiUrl = '10.0.2.2';
+  static final String apiUrl =
+      'time-table-manager-backend.swapnilcodes.repl.co';
 
   // user email id
   var data;
@@ -64,19 +65,23 @@ class _ActivateAccountState extends State<ActivateAccount> {
     if (!otp.isEmpty) {
       await http
           .post(
-              Uri(
-                  host: apiUrl,
-                  port: 5000,
-                  path: '/activateAccount',
-                  scheme: 'http'),
-              headers: <String, String>{
-                'Content-Type': 'application/json; charset=UTF-8',
-              },
-              body: json.encode(<String, String>{
+            Uri(
+              scheme: 'https',
+              host: apiUrl,
+              path: '/activateAccount',
+            ),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: json.encode(
+              <String, String>{
                 'emailId': widget.data['emailId'],
                 'otp': otp,
-              }))
+              },
+            ),
+          )
           .then((response) async => {
+                print(response.statusCode),
                 if (response.statusCode == 200 || response.statusCode == 201)
                   {
                     setState(() {
@@ -86,10 +91,10 @@ class _ActivateAccountState extends State<ActivateAccount> {
                     await http
                         .post(
                       Uri(
-                          host: apiUrl,
-                          path: '/login',
-                          port: 5000,
-                          scheme: 'http'),
+                        host: apiUrl,
+                        path: '/login',
+                        scheme: 'https',
+                      ),
                       headers: <String, String>{
                         'Content-Type': 'application/json; charset=UTF-8',
                       },
@@ -102,17 +107,22 @@ class _ActivateAccountState extends State<ActivateAccount> {
                       var userData = json.decode(value.body)['data'];
                       await StorageController()
                           .setJWT(jwt_token: userData['accessToken']);
-                      Navigator.of(context).pushNamed(Routes.home_route);
+                      Navigator.of(context)
+                          .pushNamed(Routes.home_route, arguments: userData);
                       print('userData $userData');
                     }).catchError((value) => print(value))
                   }
                 else if (response.statusCode == 400)
                   {
+                    print(response.body),
                     Navigator.of(context).pushNamed(Routes.defined_err_route,
                         arguments: 'Invalid OTP!')
                   }
                 else if (response.statusCode == 500)
-                  {Navigator.of(context).pushNamed(Routes.err_route)}
+                  {
+                    print(response.body),
+                    Navigator.of(context).pushNamed(Routes.err_route)
+                  }
               })
           .catchError((err) => {print(err.toString())});
     } else {

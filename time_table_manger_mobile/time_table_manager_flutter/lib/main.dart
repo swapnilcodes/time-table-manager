@@ -3,6 +3,7 @@ import 'package:time_table_manager_flutter/components/activate_account.dart';
 import 'package:time_table_manager_flutter/components/defined_err.dart';
 import 'package:time_table_manager_flutter/components/err.dart';
 import 'package:time_table_manager_flutter/components/home.dart';
+import 'package:time_table_manager_flutter/components/login.dart';
 import 'package:time_table_manager_flutter/components/signup.dart';
 import 'components/intro.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       themeMode: ThemeMode.dark,
       darkTheme: ThemeData(
-          scaffoldBackgroundColor: Colors.grey[900],
+          scaffoldBackgroundColor: Colors.black,
           fontFamily: GoogleFonts.raleway().fontFamily,
           primaryColor: Colors.black26,
           accentColor: Colors.white,
@@ -38,7 +39,8 @@ class MyApp extends StatelessWidget {
               DefinedError(settings.arguments.toString()),
           Routes.account_activation_route: (ctx) =>
               ActivateAccount(settings.arguments),
-          Routes.home_route: (ctx) => Home()
+          Routes.home_route: (ctx) => Home(settings.arguments),
+          Routes.login_route: (ctx) => Login(),
         };
         WidgetBuilder? builder = routes[settings.name];
         return MaterialPageRoute(builder: (ctx) => builder!(ctx));

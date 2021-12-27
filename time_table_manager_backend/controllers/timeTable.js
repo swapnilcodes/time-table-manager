@@ -6,8 +6,13 @@ import { manualAddSchedule, removeSchedule } from './schedule.js';
 const createTimeTable = async (req, res) => {
   const { emailId } = req.user;
 
+  const {title} = req.body;
+
   if (!emailId) {
     return res.status(400).send('kucch to gadbad hai daya');
+  }
+  if(!title){
+    return res.status(400).send('title kon dega bete');
   }
 
   try {
@@ -39,6 +44,7 @@ const createTimeTable = async (req, res) => {
       saturday: [],
       sunday: [],
       active: false,
+      title,
     });
 
     userData.timeTables.push(timeTableId);
@@ -281,14 +287,18 @@ const deactivateTimeTable = async (req, res) => {
     return res.status(400).send('kuccch to gadbad hai daya');
   }
 
-  const { timeTableId } = req.body;
+  const { timeTableId } = req.query;
 
   if (!timeTableId) {
     return res.status(400).send('fill all credentials');
   }
 
+  console.log(emailId);
+
   try {
     const userData = await userModel.findOne({ emailId });
+
+  
 
     if (!userData) {
       return res.status(400).send('Aap lapata hai');
@@ -301,7 +311,7 @@ const deactivateTimeTable = async (req, res) => {
       return res.status(400).send('Invalid time table id');
     }
 
-    const timeTableData = await timeTableModel.findOne(timeTableId);
+    const timeTableData = await timeTableModel.findOne({timeTableId});
 
     if (!timeTableData) {
       return res.status(400).send('Invalid time table id');
@@ -360,7 +370,7 @@ const deactivateTimeTable = async (req, res) => {
 
     await timeTableData.save();
 
-    return res.status(400).send('deactivated Timetable');
+    return res.status(200).send('deactivated Timetable');
   } catch (err) {
     console.log(err);
 

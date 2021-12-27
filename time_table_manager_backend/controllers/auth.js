@@ -62,10 +62,13 @@ const signUp = async (req, res) => {
 const activateAcc = async (req, res) => {
   try {
     const { emailId, otp } = req.body;
-
+    console.log('hsdflshfskf');
     if (!emailId || !otp) {
       return res.status(400).send('Fill all credentials');
     }
+
+    otp = parseInt(otp);
+
 
     const userData = await userModel.findOne({
       emailId,

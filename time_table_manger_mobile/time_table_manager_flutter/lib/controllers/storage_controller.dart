@@ -18,4 +18,9 @@ class StorageController {
     await storage.delete(key: 'jwt_token');
     print('deleted jwt');
   }
+
+  Future<bool> jwtExists() async {
+    bool jwtExists = await storage.containsKey(key: 'jwt_token');
+    return jwtExists;
+  }
 }
