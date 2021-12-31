@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:time_table_manager_flutter/components/home_child.dart';
 import 'package:time_table_manager_flutter/components/new.dart';
 import 'package:time_table_manager_flutter/components/profile.dart';
+import 'package:time_table_manager_flutter/components/time_table.dart';
+import 'package:time_table_manager_flutter/controllers/screen_controller_timetable.dart';
 import 'package:time_table_manager_flutter/controllers/storage_controller.dart';
 import 'package:http/http.dart' as http;
 
@@ -23,15 +25,28 @@ class _HomeState extends State<Home> {
 
   int currentIndex = 0;
 
+  bool timeTableOpen = false;
+  var currentTimeTable;
+
   void indexChange(int index) {
     setState(() {
       currentIndex = index;
     });
   }
 
+  void setTimeTableOpen(open, timeTable) {
+    setState(() {
+      timeTableOpen = open;
+      currentTimeTable = timeTable;
+    });
+  }
+
   Widget getCurrentPage(Map userData) {
+    if (timeTableOpen) {
+      return TimeTable(currentTimeTable, setTimeTableOpen);
+    }
     if (currentIndex == 0) {
-      return HomeChild(userData);
+      return HomeChild(userData, setTimeTableOpen);
     } else if (currentIndex == 1) {
       return Profile();
     } else {

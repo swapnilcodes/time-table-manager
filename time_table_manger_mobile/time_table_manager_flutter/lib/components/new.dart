@@ -168,7 +168,7 @@ class _NewState extends State<New> {
               height: !changeCreateButton ? 70 : 65,
               alignment: Alignment.center,
               child: Text(
-                'Sign Up',
+                'Create',
                 style: TextStyle(color: Colors.white, fontSize: 24),
               ),
             ),
