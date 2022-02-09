@@ -26,7 +26,7 @@ import { Server } from 'socket.io';
 const app = express();
 
 const connectionUrl =
-  'mongodb+srv://admin:swam4782s@cluster0.evz5t.mongodb.net/timeTableDb?retryWrites=true&w=majority';
+  'mongo db connection url';
 
 mongoose
   .connect(connectionUrl, {
